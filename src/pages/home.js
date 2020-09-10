@@ -12,8 +12,10 @@ export default function Home({ navigation }) {
 
   const [data, setData] = useState('');
 
+  const tipoVeiculo = ['motos', 'carros', 'caminhoes'];
+
   useEffect(() => {
-    Axios.get('http://www.fipeapi.appspot.com/api/1/carros/marcas.json')
+    Axios.get(`http://www.fipeapi.appspot.com/api/1/${tipoVeiculo[0]}/marcas.json`)
     .then(function (response) {
       console.log(response.data);
       setData(response.data);
@@ -32,7 +34,7 @@ export default function Home({ navigation }) {
         data={data}
         renderItem={({item}) => 
           <Text style={styles.item}>
-            {item.key + 'teste' + item.key}
+            {item.name + '... Key = ' + item.key}
           </Text>}
       />
       <SectionList
