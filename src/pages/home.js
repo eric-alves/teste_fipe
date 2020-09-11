@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, 
   Text, 
   FlatList,
-  SectionList,
+  TouchableOpacity,
+  Image,
   View } from 'react-native';
 import Axios from 'axios';
 import TipoVeiculo from '../components/TipoVeiculo';
@@ -11,40 +12,62 @@ import TipoVeiculo from '../components/TipoVeiculo';
 export default function Home({ navigation }) {
 
   const [data, setData] = useState('');
+  const [tipoVericulo, setTipoVeiculo] = useState(0);
 
-  const tipoVeiculo = ['motos', 'carros', 'caminhoes'];
+  const tpVeic = ['motos', 'carros', 'caminhoes'];
+
+  const img = require('../../assets/brands/acura.png');
 
   useEffect(() => {
-    Axios.get(`http://www.fipeapi.appspot.com/api/1/${tipoVeiculo[0]}/marcas.json`)
+    buscaMarcas();
+  }, []);
+
+  const buscaMarcas = (tipo = 0) => {
+    Axios.get(`http://www.fipeapi.appspot.com/api/1/${tpVeic[tipo]}/marcas.json`)
     .then(function (response) {
-      console.log(response.data);
       setData(response.data);
     })
     .catch(function (error) {
       console.log(error);
     });
-  }, []);
+  };
+
+  const buscaImage = (brand) => {
+    try{
+      return require(`../../assets/brands/${brand}.png`)
+    }catch(e){ return false }
+  }
+
+  const teste = () => {
+    console.log(tipoVericulo);
+  }
 
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor='#2D2F79' style='light' />
       <View style={styles.content}>
-        <TipoVeiculo />
-      <FlatList
-        data={data}
-        renderItem={({item}) => 
-          <Text style={styles.item}>
-            {item.name + '... Key = ' + item.key}
-          </Text>}
-      />
-      <SectionList
-          sections={[
-            {title: 'D', data: ['Devin', 'Dan', 'Dominic']},
-            {title: 'J', data: ['Jackson', 'James', 'Jillian', 'Jimmy', 'Joel', 'John', 'Julie']},
-          ]}
-          renderItem={({item}) => <Text style={styles.item}>{item}</Text>}
-          renderSectionHeader={({section}) => <Text style={styles.sectionHeader}>{section.title}</Text>}
-          keyExtractor={(item, index) => index}
+
+        <TipoVeiculo 
+          varVeic={tipoVericulo} 
+          funcVeic={setTipoVeiculo}
+          buscaMarcas={buscaMarcas} />
+        
+        <FlatList
+          data={data}
+          renderItem={({item}) => 
+            <View 
+              style={styles.divLista}>
+              <TouchableOpacity
+                style={[styles.divLista, {borderWidth: 0}]}
+                onPress={teste}
+              >
+                <Image 
+                  style={{width: 30, height: 30}} 
+                  source={buscaImage(item.name.toLowerCase())} />
+                <Text style={styles.item}>{item.name}</Text>
+              </TouchableOpacity>
+            </View>
+          }
         />
       </View>
     </View>
@@ -81,4 +104,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     backgroundColor: 'rgba(247,247,247,1.0)',
   },
+  divLista: {
+    width: '100%',
+    height: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginVertical: 2,
+    paddingHorizontal: 5,
+  }
 });

@@ -7,23 +7,25 @@ import { StyleSheet,
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons'; 
 
-export default function Home({ navigation }) {
+export default function Home(props) {
 
     const [motos, setMotos] = useState(true);
     const [carros, setCarros] = useState(false);
     const [caminhoes, setCaminhoes] = useState(false);
-    const [tipoVericulo, setTipoVeiculo] = useState(1);
 
     const checkMotos = () => {
-        if(motos){
+        if(carros || caminhoes){
             setCarros(false);
             setCaminhoes(false);
-            setTipoVeiculo(1);
+            setMotos(true);
+            props.funcVeic(0);
+            props.buscaMarcas(0);
         }else{
             setMotos(true);
             setCarros(false);
             setCaminhoes(false);
-            setTipoVeiculo(1);
+            props.funcVeic(0);
+            props.buscaMarcas(0);
         }
     }
 
@@ -31,12 +33,14 @@ export default function Home({ navigation }) {
         if(carros){
             setMotos(false);
             setCaminhoes(false);
-            setTipoVeiculo(2);
+            props.funcVeic(1);
+            props.buscaMarcas(1);
         }else{
             setMotos(false);
             setCarros(true);
             setCaminhoes(false);
-            setTipoVeiculo(2);
+            props.funcVeic(1);
+            props.buscaMarcas(1);
         }
     }
 
@@ -44,12 +48,14 @@ export default function Home({ navigation }) {
         if(caminhoes){
             setCarros(false);
             setMotos(false);
-            setTipoVeiculo(3);
+            props.funcVeic(2);
+            props.buscaMarcas(2);
         }else{
             setMotos(false);
             setCarros(false);
             setCaminhoes(true);
-            setTipoVeiculo(3);
+            props.funcVeic(2);
+            props.buscaMarcas(2);
         }
     }
 
