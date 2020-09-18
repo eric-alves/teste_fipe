@@ -5,14 +5,20 @@ import { StyleSheet,
   FlatList,
   TouchableOpacity,
   Image,
+  Picker,
   View } from 'react-native';
 import Axios from 'axios';
 import TipoVeiculo from '../components/TipoVeiculo';
 
 export default function Home({ navigation }) {
 
-  const [data, setData] = useState('');
+  const [data, setData] = useState([]);
   const [tipoVericulo, setTipoVeiculo] = useState(0);
+  const [marca, setMarca] = useState();
+  const [listaModelos, setListaModelos] = useState([]);
+  const [modelo, setModelo] = useState();
+  const [listaAnos, setListaAnos] = useState([]);
+  const [ano, setAno] = useState();
 
   const tpVeic = ['motos', 'carros', 'caminhoes'];
 
@@ -32,11 +38,33 @@ export default function Home({ navigation }) {
     });
   };
 
-  const buscaImage = (brand) => {
+  const buscaModelos = async (tipo = 0, marca) => {
+    await Axios.get(`http://www.fipeapi.appspot.com/api/1/${tpVeic[tipo]}/veiculos/${marca}.json`)
+    .then(function (response) {
+        setListaModelos(response.data);
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+  };
+
+  const buscaAnos = async (tipo = 0, marca, modelo) => {
+    await Axios.get(`http://www.fipeapi.appspot.com/api/1/${tpVeic[tipo]}/veiculo/${marca}/${modelo}.json`)
+    .then(function (response) {
+        setListaAnos(response.data);
+        console.log('func')
+        console.log(response.data)
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+};
+
+  /* const buscaImage = (brand = 'bmw') => {
     try{
       return require(`../../assets/brands/${brand}.png`)
     }catch(e){ return false }
-  }
+  } */
 
   const teste = () => {
     console.log(tipoVericulo);
@@ -51,24 +79,65 @@ export default function Home({ navigation }) {
           varVeic={tipoVericulo} 
           funcVeic={setTipoVeiculo}
           buscaMarcas={buscaMarcas} />
+
+        <Picker
+          style={{ height: 50, width: '100%', marginTop: 20 }}
+          selectedValue={marca}
+          onValueChange={(itemValue) => 
+            {
+              setMarca(itemValue);
+              buscaModelos(tipoVericulo, itemValue);
+            }}
+        >   
+          <Picker.Item label='Escolha a marca' />
+          { data.map((item) => {
+              return <Picker.Item label={item.name} 
+                      value={item.id} 
+                      key={item.id} />;
+          }) }
+        </Picker>
         
-        <FlatList
-          data={data}
-          renderItem={({item}) => 
-            <View 
-              style={styles.divLista}>
-              <TouchableOpacity
-                style={[styles.divLista, {borderWidth: 0}]}
-                onPress={teste}
-              >
-                <Image 
-                  style={{width: 30, height: 30}} 
-                  source={buscaImage(item.name.toLowerCase())} />
-                <Text style={styles.item}>{item.name}</Text>
-              </TouchableOpacity>
-            </View>
-          }
-        />
+        {marca ?
+          <Picker
+            style={{ height: 50, width: '100%', marginTop: 20 }}
+            selectedValue={modelo}
+            onValueChange={(itemValue) => 
+              {
+                setModelo(itemValue);
+                buscaAnos(tipoVericulo, marca, itemValue);
+              }}
+          >   
+            <Picker.Item label='Escolha a marca' /> 
+            { listaModelos.map((item) => {
+                return <Picker.Item label={item.name} 
+                        value={item.id} 
+                        key={item.id} />;
+            }) }
+          </Picker> : <View />
+        }
+
+        {modelo ?
+          <Picker
+            style={{ height: 50, width: '100%', marginTop: 20 }}
+            selectedValue={ano}
+            onValueChange={(itemValue) => 
+              {
+                setAno(itemValue);
+                //buscaModelos(itemValue);
+              }}
+          >   
+            <Picker.Item label='Escolha a marca' />
+            { listaAnos.map((item) => {
+                return <Picker.Item label={item.name} 
+                        value={item.id} 
+                        key={item.id} />;
+            }) }
+          </Picker> : <View />
+        }
+
+        {marca ? <Text>{'Marca = ' + marca}</Text> : <Text>Marca = </Text>}
+        {modelo ? <Text>{'Modelo = ' + modelo}</Text> : <Text>Modelo = </Text>}
+        {ano ? <Text>{'Ano = ' + ano}</Text> : <Text>Ano = </Text>}
       </View>
     </View>
   );

@@ -28,7 +28,7 @@ const App = () => {
       const teste = brand;
     try{
         //console.warn(String(brand))
-      return require('../../assets/brands/'+teste+'.png')
+      return require('../../assets/images/back_button.png')
     }catch(e){ return require('../../assets/images/back_button.png') }
   }
 
@@ -55,9 +55,9 @@ const App = () => {
                 <TouchableOpacity
                     style={[styles.divLista, {borderWidth: 0}]}
                 >
-                    <Image 
+                    {/* <Image 
                         style={{width: 30, height: 30}} 
-                        source={buscaImage(item.name.toLowerCase())} />
+                        source={buscaImage(item.name.toLowerCase())} /> */}
                     <Text style={styles.item}>{item.name}</Text>
                 </TouchableOpacity>
                 </View>
