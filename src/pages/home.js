@@ -4,11 +4,15 @@ import { StyleSheet,
   Text, 
   FlatList,
   TouchableOpacity,
+  TouchableHighlight,
   Image,
   Picker,
-  View } from 'react-native';
+  View,
+  Modal,
+  Alert } from 'react-native';
 import Axios from 'axios';
 import TipoVeiculo from '../components/TipoVeiculo';
+import brands from '../services/brands';
 
 export default function Home({ navigation }) {
 
@@ -20,9 +24,13 @@ export default function Home({ navigation }) {
   const [listaAnos, setListaAnos] = useState([]);
   const [ano, setAno] = useState();
 
+  const [modalVisible, setModalVisible] = useState(false);
+
   const tpVeic = ['motos', 'carros', 'caminhoes'];
 
   const img = require('../../assets/brands/acura.png');
+
+  const testImg = 'bmw';
 
   useEffect(() => {
     buscaMarcas();
@@ -58,13 +66,25 @@ export default function Home({ navigation }) {
     .catch(function (error) {
         console.log(error);
     });
-};
+  };
 
-  /* const buscaImage = (brand = 'bmw') => {
-    try{
-      return require(`../../assets/brands/${brand}.png`)
-    }catch(e){ return false }
-  } */
+  const buscaImage = (brand) => {
+    console.log(brand);
+
+    if(brand){
+      try{
+        return brands[brands[brand]];
+      }catch(e){ 
+        return brands['bmw'];
+      }
+    }else {
+      return require(`../../assets/brands/${'bmw'}.png`);
+    }
+
+    /* try{
+      return require(`../../assets/brands/${brand}.png`);
+    }catch(e){ return require(`../../assets/brands/${'audi'}.png`) } */
+  }
 
   const teste = () => {
     console.log(tipoVericulo);
@@ -126,7 +146,7 @@ export default function Home({ navigation }) {
                 //buscaModelos(itemValue);
               }}
           >   
-            <Picker.Item label='Escolha a marca' />
+            <Picker.Item label='Escolha o ano' />
             { listaAnos.map((item) => {
                 return <Picker.Item label={item.name} 
                         value={item.id} 
@@ -138,6 +158,51 @@ export default function Home({ navigation }) {
         {marca ? <Text>{'Marca = ' + marca}</Text> : <Text>Marca = </Text>}
         {modelo ? <Text>{'Modelo = ' + modelo}</Text> : <Text>Modelo = </Text>}
         {ano ? <Text>{'Ano = ' + ano}</Text> : <Text>Ano = </Text>}
+
+        <View style={{alignItems: 'center', 
+          justifyContent: 'center',
+          width: '100%'}}>
+          <Modal
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              Alert.alert("Modal has been closed.");
+              setModalVisible(false);
+            }}
+          >
+            <View style={{width: '95%', 
+                height: '100%', 
+                marginHorizontal: 5,
+                backgroundColor: 'white'}}>
+              <FlatList
+              data={data}
+              renderItem={({item}) => 
+                  <View 
+                  style={styles.divLista}>
+                  <TouchableOpacity
+                      style={[styles.divLista, {borderWidth: 0}]}
+                  >
+                    <Image 
+                      style={{width: 30, height: 30}} 
+                      source={buscaImage(item.name.toLowerCase())}
+                      /* source={require(`../../assets/brands/${}.png`)} *//>
+                    <Text style={styles.item}>{item.name}</Text>
+                  </TouchableOpacity>
+                  </View>
+              }
+              />
+            </View>
+          </Modal>
+        </View>
+
+        <TouchableHighlight
+            style={styles.openButton}
+            onPress={() => {
+              setModalVisible(true);
+            }}
+        >
+            <Text style={styles.textStyle}>Show Modal</Text>
+        </TouchableHighlight>
       </View>
     </View>
   );
@@ -183,5 +248,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginVertical: 2,
     paddingHorizontal: 5,
-  }
+  },
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
